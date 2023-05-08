@@ -1,25 +1,49 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState }  from "react";
+import { starWars, uniqueNamesGenerator } from "unique-names-generator";
 
-function App() {
+export function Test() {
+  const randomName = () => uniqueNamesGenerator({dictionaries: [starWars], length: 1})
+
+  const [state, setState] = useState({
+    name: randomName(),
+    editMode: false,
+    button: 'own'
+  })
+  const [status, setStatus] = useState('')
+
+  const changeName = () => setState((prev) => ({...prev, name: randomName()}))
+
+  const changeEditMode = () => setState((prev) => ({...prev, editMode: !state.editMode}))
+
+  const changeStatus = (e) => {
+    setStatus(e.currentTarget.value)
+  }
+  
+  useEffect(() => {
+    if (state.editMode) {
+      setState((prev) => ({...prev, button: 'ok'}))
+    setStatus(state.name)
+
+    }else {
+      setState((prev) => ({...prev, button: 'own'}))
+    }
+
+  }, [state.editMode, state.name])
+
+  useEffect(() => {
+    setState((prev) => ({...prev, name: status}))
+
+  }, [state.button, status])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+    <>
+      <h1>{state.name}</h1>
+      <button onClick={changeName}>Random</button>
+      <button onClick={changeEditMode}>{state.button}</button>
 
-export default App;
+      {state.editMode &&
+        <input type="text" onChange={changeStatus} value={status}/>
+      }
+    </>
+  )
+}
